@@ -1,5 +1,5 @@
 [package]
-name = "jrox"
+name = "rox"
 version = "0.1.0"
 authors = ["Jake Goldsborough <jake.goldsborough@pm.me>"]
 edition = "2018"

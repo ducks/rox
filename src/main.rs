@@ -33,7 +33,7 @@ impl Rox {
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        println!("{:?}", file);
+        println!("{:?}", contents);
 
         Ok(())
     }

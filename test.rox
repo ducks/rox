@@ -1,2 +1,4 @@
 == <=    >=
+// this is a comment and shouldn't get scanned
+/
 =

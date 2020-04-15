@@ -82,6 +82,13 @@ impl Scanner {
             } else {
                 self.add_token(GREATER)
             },
+            '/' => if self._match(&'/') {
+                while self.peek() != '\n' && !self.is_at_end() {
+                    self.advance();
+                }
+            } else {
+                self.add_token(SLASH)
+            },
             _ => println!("No match"),
         }
     }
@@ -89,6 +96,14 @@ impl Scanner {
     fn advance(&mut self) -> char {
         self.current += 1;
         self.chars[self.current as usize - 1]
+    }
+
+    fn peek(&mut self) -> char {
+        if self.is_at_end() {
+            '\0';
+        }
+
+        self.chars[self.current as usize]
     }
 
     fn add_token(&mut self, ttype: TokenType) {

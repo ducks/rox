@@ -5,10 +5,19 @@ use std::{
     path::{ Path, PathBuf }
 };
 
+mod scanner;
+mod token;
+
+use scanner::Scanner;
+use token::Token;
+
+
 use structopt::StructOpt;
 
 #[derive(Debug)]
-pub struct Rox;
+pub struct Rox {
+    hadError: bool
+}
 
 #[derive(StructOpt, Debug)]
 #[structopt(name = "rox")]
@@ -20,7 +29,7 @@ struct Args {
 impl Rox {
     pub fn main(args: Vec<PathBuf>) {
         if args.len() > 1 {
-            panic!("Usage: jrox [script]");
+            panic!("Usage: rox [script]");
         } else if args.len() == 1 {
             Rox::run_file(&args[0]); 
         } else {
@@ -28,22 +37,50 @@ impl Rox {
         }
     }
     
-    pub fn run_file<P>(path: P) -> io::Result<()> where P: AsRef<Path> {
-        let mut file = File::open(path)?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
+    pub fn run_file<P>(path: P) -> io::Result<()> 
+        where P: AsRef<Path> {
+            let mut file = File::open(path)?;
+            let mut contents = String::new();
+            file.read_to_string(&mut contents)?;
 
-        println!("{:?}", contents);
+            Rox::run(&contents);
+
+            Ok(())
+    }
+
+    pub fn run_prompt() -> io::Result<()> {
+        let mut input = String::new();
+
+        loop {
+            print!("> ");
+            let stdin = io::stdin();
+            io::stdout().flush();
+            stdin.read_line(&mut input)?;
+            Rox::run(&input);
+        }
 
         Ok(())
     }
 
-    pub fn run_prompt() {
+    pub fn run(contents: &String) {
+        let scanner = Scanner {
+            source: contents.to_string(),
+            ..Default::default()
+        };
 
+        let tokens: Vec<Token> = scanner.scan_tokens();
+
+        for token in &tokens {
+            println!("{}", token);
+        }
     }
 
-    pub fn run() {
+    pub fn error(line: i32, message: String) {
+        Rox::report(line, message)
+    }
 
+    fn report(line: i32, message: String) {
+        eprintln!("[line {} + ] Error: {}", line, message);
     }
 }
 

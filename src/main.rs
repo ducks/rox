@@ -14,9 +14,10 @@ use token::Token;
 
 use structopt::StructOpt;
 
-#[derive(Debug)]
-pub struct Rox {
-    hadError: bool
+#[derive(Debug, Default)]
+struct Rox {
+    has_error: bool,
+    is_at_end: bool
 }
 
 #[derive(StructOpt, Debug)]
@@ -27,6 +28,12 @@ struct Args {
 }
 
 impl Rox {
+    pub fn new() -> Self {
+        Rox {
+            ..Default::default()
+        }
+    }
+
     pub fn main(args: Vec<PathBuf>) {
         if args.len() > 1 {
             panic!("Usage: rox [script]");
@@ -83,5 +90,8 @@ impl Rox {
 
 fn main() {
     let args = Args::from_args();
-    Rox::main(args.path)
+    let rox = Rox::new();
+    println!("{:#?}", rox);
+
+    rox::main(args.path)
 }

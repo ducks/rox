@@ -23,6 +23,7 @@ impl Scanner {
         Scanner {
             source: source.clone(),
             chars: source.clone().chars().collect(),
+            line: 1,
             ..Default::default()
         }
     }
@@ -57,6 +58,10 @@ impl Scanner {
             '+' => self.add_token(PLUS),
             ';' => self.add_token(SEMICOLON),
             '*' => self.add_token(STAR),
+            ' ' => return,
+            '\r' => return,
+            '\t' => return,
+            '\n' => self.line += 1,
             '!' => if self._match(&'=') {
                 self.add_token(BANG_EQUAL)
             } else {

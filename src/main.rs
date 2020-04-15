@@ -11,7 +11,6 @@ mod token;
 use scanner::Scanner;
 use token::Token;
 
-
 use structopt::StructOpt;
 
 #[derive(Debug, Default)]

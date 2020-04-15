@@ -63,15 +63,12 @@ impl Rox {
     }
 
     pub fn run(contents: &String) {
-        let scanner = Scanner {
-            source: contents.to_string(),
-            ..Default::default()
-        };
+        let mut scanner = Scanner::new(contents);
 
-        let tokens: Vec<Token> = scanner.scan_tokens();
+        let tokens: &Vec<Token> = scanner.scan_tokens();
 
-        for token in &tokens {
-            println!("{}", token);
+        for token in tokens {
+            println!("{:#?}", token);
         }
     }
 

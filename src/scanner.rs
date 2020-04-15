@@ -8,6 +8,7 @@ use std::convert::TryInto;
 
 use std::collections::HashMap;
 
+#[derive(Default)]
 pub struct Scanner {
     source: String,
     chars: Vec<char>,
@@ -17,29 +18,16 @@ pub struct Scanner {
     line: i32
 }
 
-impl Default for Scanner {
-    fn default() -> Self { 
-        Scanner { 
-            source: String::from(""),
-            chars: Vec::new(),
-            tokens: Vec::new(),
-            start: 0, 
-            current: 0, 
-            line: 1,
-        } 
-    }
-}
-
 impl Scanner {
-    pub fn new(&self) -> Self {
+    pub fn new(source: &String) -> Self {
         Scanner {
-            source: self.source,
-            chars: self.source.chars().collect(),
+            source: source.clone(),
+            chars: source.clone().chars().collect(),
             ..Default::default()
         }
     }
 
-    pub fn scan_tokens(&self) -> Vec<Token> {
+    pub fn scan_tokens(&mut self) -> &Vec<Token> {
         while !self.is_at_end() {
           self.start = self.current;
           self.scan_token();
@@ -52,26 +40,35 @@ impl Scanner {
             line: self.line
         });
 
-        self.tokens
+        &self.tokens
     }
 
-    fn scan_token(&self) {
+    fn scan_token(&mut self) {
         let ch = self.advance();
 
         match ch {
             '(' => self.add_token(LEFT_PAREN),
             ')' => self.add_token(RIGHT_PAREN),
+            '{' => self.add_token(LEFT_BRACE),
+            '}' => self.add_token(RIGHT_BRACE),
+            ',' => self.add_token(COMMA),
+            '.' => self.add_token(DOT),
+            '-' => self.add_token(MINUS),
+            '+' => self.add_token(PLUS),
+            ';' => self.add_token(SEMICOLON),
+            '*' => self.add_token(STAR),
             _ => println!("No match"),
         }
     }
 
-    fn advance(&self) {
+    fn advance(&mut self) -> char {
         self.current += 1;
-        self.chars[self.current]
+        self.chars[self.current as usize - 1]
     }
 
-    fn add_token(&self, ttype: TokenType) {
-        let text = self.chars[self.start..self.current];
+    fn add_token(&mut self, ttype: TokenType) {
+        let chars = &self.chars[self.start as usize..self.current as usize];
+        let text = chars.into_iter().collect();
 
         self.tokens.push(Token { 
             ttype: ttype,
@@ -81,7 +78,7 @@ impl Scanner {
         });
     }
 
-    fn is_at_end(&self) -> bool {
+    fn is_at_end(&mut self) -> bool {
         self.current >= self.source.chars().count().try_into().unwrap()
     }
 }

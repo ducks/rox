@@ -3,11 +3,12 @@ use std::{
     fmt
 };
 
+#[derive(Debug)]
 pub struct Token {
-    ttype: TokenType,
-    lexeme: String,
-    literal: HashMap<String, String>,
-    line: i32
+    pub ttype: TokenType,
+    pub lexeme: String,
+    pub literal: HashMap<String, String>,
+    pub line: i32
 }
 
 impl fmt::Display for Token {

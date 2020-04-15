@@ -8,17 +8,19 @@ use std::convert::TryInto;
 
 use std::collections::HashMap;
 
+use crate::Rox;
+
 #[derive(Default)]
-pub struct Scanner {
+pub struct Scanner<T> {
     source: String,
     chars: Vec<char>,
-    tokens: Vec<Token>,
+    tokens: Vec<Token<T>>,
     start: i32,
     current: i32,
     line: i32
 }
 
-impl Scanner {
+impl<T> Scanner<T> {
     pub fn new(source: &String) -> Self {
         Scanner {
             source: source.clone(),
@@ -28,7 +30,7 @@ impl Scanner {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> &Vec<Token> {
+    pub fn scan_tokens(&mut self) -> &Vec<Token<T>> {
         while !self.is_at_end() {
           self.start = self.current;
           self.scan_token();
@@ -37,7 +39,7 @@ impl Scanner {
         self.tokens.push(Token {
             ttype: EOF,
             lexeme: String::from(""),
-            literal: HashMap::new(),
+            literal: None,
             line: self.line
         });
 
@@ -48,46 +50,46 @@ impl Scanner {
         let ch = self.advance();
 
         match ch {
-            '(' => self.add_token(LEFT_PAREN),
-            ')' => self.add_token(RIGHT_PAREN),
-            '{' => self.add_token(LEFT_BRACE),
-            '}' => self.add_token(RIGHT_BRACE),
-            ',' => self.add_token(COMMA),
-            '.' => self.add_token(DOT),
-            '-' => self.add_token(MINUS),
-            '+' => self.add_token(PLUS),
-            ';' => self.add_token(SEMICOLON),
-            '*' => self.add_token(STAR),
+            '(' => self.add_token(LEFT_PAREN, None),
+            ')' => self.add_token(RIGHT_PAREN, None),
+            '{' => self.add_token(LEFT_BRACE, None),
+            '}' => self.add_token(RIGHT_BRACE, None),
+            ',' => self.add_token(COMMA, None),
+            '.' => self.add_token(DOT, None),
+            '-' => self.add_token(MINUS, None),
+            '+' => self.add_token(PLUS, None),
+            ';' => self.add_token(SEMICOLON, None),
+            '*' => self.add_token(STAR, None),
             ' ' => return,
             '\r' => return,
             '\t' => return,
             '\n' => self.line += 1,
             '!' => if self._match(&'=') {
-                self.add_token(BANG_EQUAL)
+                self.add_token(BANG_EQUAL, None)
             } else {
-                self.add_token(BANG)
+                self.add_token(BANG, None)
             },
             '=' => if self._match(&'=') {
-                self.add_token(EQUAL_EQUAL)
+                self.add_token(EQUAL_EQUAL, None)
             } else {
-                self.add_token(EQUAL)
+                self.add_token(EQUAL, None)
             },
             '<' => if self._match(&'=') {
-                self.add_token(LESS_EQUAL)
+                self.add_token(LESS_EQUAL, None)
             } else {
-                self.add_token(LESS)
+                self.add_token(LESS, None)
             },
             '>' => if self._match(&'=') {
-                self.add_token(GREATER_EQUAL)
+                self.add_token(GREATER_EQUAL, None)
             } else {
-                self.add_token(GREATER)
+                self.add_token(GREATER, None)
             },
             '/' => if self._match(&'/') {
                 while self.peek() != '\n' && !self.is_at_end() {
                     self.advance();
                 }
             } else {
-                self.add_token(SLASH)
+                self.add_token(SLASH, None)
             },
             _ => println!("No match"),
         }
@@ -106,16 +108,38 @@ impl Scanner {
         self.chars[self.current as usize]
     }
 
-    fn add_token(&mut self, ttype: TokenType) {
+    fn add_token(&mut self, ttype: TokenType, literal: Option<T>) {
         let chars = &self.chars[self.start as usize..self.current as usize];
         let text = chars.into_iter().collect();
 
         self.tokens.push(Token {
             ttype: ttype,
             lexeme: text,
-            literal: HashMap::new(),
+            literal: Some(literal),
             line: self.line
         });
+    }
+
+    fn parse_string(&mut self) {
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
+                self.line += 1
+            }
+
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            Rox::error(self.line, String::from("Unterminated string."));
+            return;
+        }
+
+        self.advance();
+
+        let value = self.chars[
+            self.start as usize + 1 ..self.current as usize - 1
+        ];
+        self.add_token(STRING, Some(value));
     }
 
     fn is_at_end(&mut self) -> bool {

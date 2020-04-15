@@ -1,5 +1,5 @@
-use crate::token::{ 
-    Token, 
+use crate::token::{
+    Token,
     TokenType,
     TokenType::*,
 };
@@ -33,8 +33,8 @@ impl Scanner {
           self.scan_token();
         }
 
-        self.tokens.push(Token { 
-            ttype: EOF, 
+        self.tokens.push(Token {
+            ttype: EOF,
             lexeme: String::from(""),
             literal: HashMap::new(),
             line: self.line
@@ -57,6 +57,26 @@ impl Scanner {
             '+' => self.add_token(PLUS),
             ';' => self.add_token(SEMICOLON),
             '*' => self.add_token(STAR),
+            '!' => if self._match(&'=') {
+                self.add_token(BANG_EQUAL)
+            } else {
+                self.add_token(BANG)
+            },
+            '=' => if self._match(&'=') {
+                self.add_token(EQUAL_EQUAL)
+            } else {
+                self.add_token(EQUAL)
+            },
+            '<' => if self._match(&'=') {
+                self.add_token(LESS_EQUAL)
+            } else {
+                self.add_token(LESS)
+            },
+            '>' => if self._match(&'=') {
+                self.add_token(GREATER_EQUAL)
+            } else {
+                self.add_token(GREATER)
+            },
             _ => println!("No match"),
         }
     }
@@ -70,7 +90,7 @@ impl Scanner {
         let chars = &self.chars[self.start as usize..self.current as usize];
         let text = chars.into_iter().collect();
 
-        self.tokens.push(Token { 
+        self.tokens.push(Token {
             ttype: ttype,
             lexeme: text,
             literal: HashMap::new(),
@@ -80,5 +100,18 @@ impl Scanner {
 
     fn is_at_end(&mut self) -> bool {
         self.current >= self.source.chars().count().try_into().unwrap()
+    }
+
+    fn _match(&mut self, expected: &char) -> bool {
+        if self.is_at_end() {
+            return false
+        };
+
+        if self.chars[self.current as usize] != *expected {
+            return false
+        };
+
+        self.current += 1;
+        true
     }
 }

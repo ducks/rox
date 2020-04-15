@@ -90,8 +90,6 @@ impl Rox {
 
 fn main() {
     let args = Args::from_args();
-    let rox = Rox::new();
-    println!("{:#?}", rox);
 
-    rox::main(args.path)
+    Rox::main(args.path)
 }

@@ -5,21 +5,19 @@ use super::token::{ Token,
 
 use std::convert::TryInto;
 
-use std::collections::HashMap;
-
 use crate::Rox;
 
 #[derive(Default)]
-pub struct Scanner {
+pub struct Scanner<T> {
     source: String,
     chars: Vec<char>,
-    tokens: Vec<Token>,
+    tokens: Vec<Token<T>>,
     start: i32,
     current: i32,
     line: i32
 }
 
-impl Scanner {
+impl<T: std::default::Default> Scanner<T> {
     pub fn new(source: &String) -> Self {
         Scanner {
             source: source.clone(),
@@ -29,7 +27,7 @@ impl Scanner {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> &Vec<Token> {
+    pub fn scan_tokens(&mut self) -> &Vec<Token<T>> {
         while !self.is_at_end() {
           self.start = self.current;
           self.scan_token();
@@ -107,14 +105,14 @@ impl Scanner {
         self.chars[self.current as usize]
     }
 
-    fn add_token(&mut self, ttype: TokenType, literal: Option) {
+    fn add_token(&mut self, ttype: TokenType, literal: Option<T>) {
         let chars = &self.chars[self.start as usize..self.current as usize];
         let text = chars.into_iter().collect();
 
         self.tokens.push(Token {
-            ttype: ttype,
+            ttype,
             lexeme: text,
-            literal: Some(literal),
+            literal: literal,
             line: self.line
         });
     }

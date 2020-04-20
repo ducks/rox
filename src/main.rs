@@ -1,9 +1,4 @@
-use std::{
-    fs::File,
-    io,
-    io::prelude::*,
-    path::{ Path, PathBuf }
-};
+use std::path::PathBuf;
 
 use structopt::StructOpt;
 

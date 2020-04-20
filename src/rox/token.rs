@@ -1,17 +1,14 @@
-use std::{
-    collections::HashMap,
-    fmt
-};
+use std::fmt;
 
 #[derive(Debug)]
-pub struct Token {
+pub struct Token<T> {
     pub ttype: TokenType,
     pub lexeme: String,
-    pub literal: Option,
+    pub literal: Option<T>,
     pub line: i32
 }
 
-impl fmt::Display for Token {
+impl<T: std::fmt::Debug> fmt::Display for Token<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ttype:{:#?} lexeme:{} literal:{:#?}", self.ttype, self.lexeme, self.literal)
     }

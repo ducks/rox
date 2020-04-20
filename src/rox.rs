@@ -2,7 +2,7 @@ use std::{
     fs::File,
     io,
     io::prelude::*,
-    path::{ Path, PathBuf }
+    path::Path,
 };
 
 mod scanner;
@@ -49,14 +49,8 @@ impl Rox {
         Ok(())
     }
 
-    pub fn run(contents: &String) {
-        let mut scanner = Scanner::new(contents);
-
-        let tokens: &Vec<Token> = scanner.scan_tokens();
-
-        for token in tokens {
-            println!("{:#?}", token);
-        }
+    pub fn run<T: std::default::Default>(contents: &String) {
+        let mut scanner = Scanner::<T>::new(&contents);
     }
 
     pub fn error(line: i32, message: String) {

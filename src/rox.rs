@@ -5,6 +5,12 @@ use std::{
     path::{ Path, PathBuf }
 };
 
+mod scanner;
+mod token;
+
+use scanner::Scanner;
+use token::Token;
+
 #[derive(Debug, Default)]
 pub struct Rox {
     has_error: bool,
@@ -46,7 +52,7 @@ impl Rox {
     pub fn run(contents: &String) {
         let mut scanner = Scanner::new(contents);
 
-        let tokens: &Vec<Token<T>> = scanner.scan_tokens();
+        let tokens: &Vec<Token> = scanner.scan_tokens();
 
         for token in tokens {
             println!("{:#?}", token);

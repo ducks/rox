@@ -4,14 +4,14 @@ use std::{
 };
 
 #[derive(Debug)]
-pub struct Token<T> {
+pub struct Token {
     pub ttype: TokenType,
     pub lexeme: String,
-    pub literal: Option<T>,
+    pub literal: Option,
     pub line: i32
 }
 
-impl<T> fmt::Display for Token<T> {
+impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "ttype:{:#?} lexeme:{} literal:{:#?}", self.ttype, self.lexeme, self.literal)
     }

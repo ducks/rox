@@ -1,5 +1,4 @@
-use crate::rox::token::{
-    Token,
+use super::token::{ Token,
     TokenType,
     TokenType::*,
 };
@@ -11,16 +10,16 @@ use std::collections::HashMap;
 use crate::Rox;
 
 #[derive(Default)]
-pub struct Scanner<T> {
+pub struct Scanner {
     source: String,
     chars: Vec<char>,
-    tokens: Vec<Token<T>>,
+    tokens: Vec<Token>,
     start: i32,
     current: i32,
     line: i32
 }
 
-impl<T> Scanner<T> {
+impl Scanner {
     pub fn new(source: &String) -> Self {
         Scanner {
             source: source.clone(),
@@ -30,7 +29,7 @@ impl<T> Scanner<T> {
         }
     }
 
-    pub fn scan_tokens(&mut self) -> &Vec<Token<T>> {
+    pub fn scan_tokens(&mut self) -> &Vec<Token> {
         while !self.is_at_end() {
           self.start = self.current;
           self.scan_token();
@@ -108,7 +107,7 @@ impl<T> Scanner<T> {
         self.chars[self.current as usize]
     }
 
-    fn add_token(&mut self, ttype: TokenType, literal: Option<T>) {
+    fn add_token(&mut self, ttype: TokenType, literal: Option) {
         let chars = &self.chars[self.start as usize..self.current as usize];
         let text = chars.into_iter().collect();
 
